@@ -1,4 +1,5 @@
 #include "PDFWriter.hpp"
+#include "PDFLiterals.hpp"
 
 bool charta::pdf::PDFWriter::writeHeader(std::ostream &stream, const PDFDocument &doc)
 {
@@ -22,7 +23,7 @@ bool charta::pdf::PDFWriter::writeHeader(std::ostream &stream, const PDFDocument
 bool charta::pdf::PDFWriter::writeEndOfFile(std::ostream &stream)
 {
     // Indicates that this PDF ends
-    if (!writeComment(stream, "%EOF"))
+    if (!writeComment(stream, PDF_COMMENT_EOF))
     {
         return false;
     }
@@ -34,12 +35,12 @@ bool charta::pdf::PDFWriter::writeXRefTable(std::ostream &stream, const PDFDocum
 {
     tablePos = stream.tellp();
 
-    return writeKeyword(stream, "xref");
+    return writeKeyword(stream, PDF_KEYWORD_XREF);
 }
 
 bool charta::pdf::PDFWriter::writeXRefTableReference(std::ostream &stream, const size_t tablePos)
 {
-    if (!writeKeyword(stream, "startxref"))
+    if (!writeKeyword(stream, PDF_KEYWORD_STARTXREF))
     {
         return false;
     }
@@ -52,15 +53,30 @@ bool charta::pdf::PDFWriter::writeXRefTableReference(std::ostream &stream, const
     return writeNewLine(stream);
 }
 
+bool charta::pdf::PDFWriter::writeCatalogObject(std::ostream &stream)
+{
+    auto &object = startWriteObject(stream);
+
+    std::map<std::string, std::string> trailerDict;
+    trailerDict[PDF_DICT_KEY_TYPE] = PDF_DICT_VALUE_CATALOG;
+
+    if (!writeDictionary(stream, trailerDict))
+    {
+        return false;
+    }
+
+    return endWriteObject(stream);
+}
+
 bool charta::pdf::PDFWriter::writeTrailer(std::ostream &stream, const PDFDocument &doc)
 {
-    if (!writeKeyword(stream, "trailer"))
+    if (!writeKeyword(stream, PDF_KEYWORD_TRAILER))
     {
         return false;
     }
 
     std::map<std::string, std::string> trailerDict;
-    trailerDict["Size"] = "0";
+    trailerDict[PDF_DICT_KEY_SIZE] = "0";
 
     if (!writeDictionary(stream, trailerDict))
     {
@@ -70,17 +86,18 @@ bool charta::pdf::PDFWriter::writeTrailer(std::ostream &stream, const PDFDocumen
     return true;
 }
 
-bool charta::pdf::PDFWriter::writeInteger(std::ostream &stream, int value)
+bool charta::pdf::PDFWriter::writeInteger(std::ostream &stream, int value, char seperator)
 {
     std::string value_str = std::to_string(value);
     stream.write(value_str.data(), value_str.size());
-
+    stream.put(seperator);
+    
     return !stream.bad();
 }
 
 bool charta::pdf::PDFWriter::writeComment(std::ostream &stream, std::string_view comment)
 {
-    stream.put('%');
+    stream.put(PDF_COMMENT_PREFIX);
     stream.write(comment.data(), comment.size());
 
     return writeNewLine(stream);
@@ -95,7 +112,7 @@ bool charta::pdf::PDFWriter::writeKeyword(std::ostream &stream, std::string_view
 
 bool charta::pdf::PDFWriter::writeNewLine(std::ostream &stream)
 {
-    stream.write("\r\n", 2);
+    stream.write(PDF_NEWLINE, 2);
     return !stream.bad();
 }
 
@@ -107,4 +124,29 @@ bool charta::pdf::PDFWriter::writeDictionary(std::ostream &stream, const std::ma
     }
 
     return writeKeyword(stream, ">>");
+}
+
+charta::pdf::PDFWriter::ObjectWriteInformation &charta::pdf::PDFWriter::startWriteObject(std::ostream &stream)
+{
+    auto &obj = allocateWriteObject();
+    obj.write_pos = stream.tellp();
+    obj.written = true;
+
+    writeInteger(stream, obj.id);
+    writeInteger(stream, 0);
+    writeKeyword(stream, PDF_KEYWORD_OBJECT);
+
+    return obj;
+}
+
+bool charta::pdf::PDFWriter::endWriteObject(std::ostream &stream)
+{
+    return writeKeyword(stream, PDF_KEYWORD_END_OBJECT);
+}
+
+charta::pdf::PDFWriter::ObjectWriteInformation &charta::pdf::PDFWriter::allocateWriteObject()
+{
+    auto &obj = m_writeObjects.emplace_back();
+    obj.id = m_writeObjects.size();
+    return obj;
 }

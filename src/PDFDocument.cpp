@@ -17,6 +17,11 @@ bool charta::pdf::PDFDocument::saveTo(std::string_view filepath)
         return false;
     }
 
+    if (!writer.writeCatalogObject(fout))
+    {
+        return false;
+    }
+
     size_t xrefOffset = 0;
     if (!writer.writeXRefTable(fout, *this, xrefOffset))
     {

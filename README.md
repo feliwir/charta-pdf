@@ -5,7 +5,7 @@ A modern C++ library for processing **PDF** documents.
 ## Build status
 [![CI](https://github.com/feliwir/charta-pdf/actions/workflows/ci.yml/badge.svg)](https://github.com/feliwir/charta-pdf/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/feliwir/charta-pdf/branch/master/graph/badge.svg?token=2XKMBCI2MR)](https://codecov.io/gh/feliwir/charta-pdf)
-
+ [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 ## Example
 
 How to write an empty PDF file with metainformation:

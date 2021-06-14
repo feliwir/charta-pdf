@@ -1,5 +1,5 @@
 #pragma once
-#include "ObjectReference.hpp"
+#include "objects/IndirectObject.hpp"
 #include <charta/Info.hpp>
 
 namespace charta::pdf
@@ -7,28 +7,28 @@ namespace charta::pdf
 class Trailer
 {
   public:
-    inline void setRoot(ObjectReference root)
+    inline void setRoot(IndirectObject root)
     {
         m_root = root;
     }
 
-    inline ObjectReference getRoot() const
+    inline IndirectObject getRoot() const
     {
         return m_root;
     }
 
-    inline void setInfo(ObjectReference info)
+    inline void setInfo(IndirectObject info)
     {
         m_info = info;
     }
 
-    inline std::optional<ObjectReference> getInfo() const
+    inline std::optional<IndirectObject> getInfo() const
     {
         return m_info;
     }
 
   private:
-    ObjectReference m_root = 0;
-    std::optional<ObjectReference> m_info;
+    IndirectObject m_root = 0;
+    std::optional<IndirectObject> m_info;
 };
 } // namespace charta::pdf

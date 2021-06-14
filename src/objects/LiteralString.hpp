@@ -16,7 +16,7 @@ class LiteralString
     }
 
     // TODO: escape the string
-    inline std::string_view getContent() const 
+    inline std::string_view getContent() const
     {
         return m_content;
     }

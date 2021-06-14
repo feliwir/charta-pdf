@@ -11,6 +11,8 @@ TEST(Document, Write)
     Document doc;
 
     Info info;
+    info.Title = "Test document";
+    info.Subject = "Testing";
     info.Author = "Stephan Vedder";
     doc.setInfo(info);
 

@@ -3,5 +3,5 @@
 
 namespace charta::pdf
 {
-using ObjectReference = size_t;
+using IndirectObject = size_t;
 }

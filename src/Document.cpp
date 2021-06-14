@@ -27,12 +27,12 @@ bool charta::pdf::Document::saveToStream(std::ostream &stream)
         return false;
     }
 
-    if(m_info.has_value())
+    if (m_info.has_value())
     {
-       if(!writer.writeInfoObject(stream, m_info.value()))
-       {
-           return false;
-       }
+        if (!writer.writeInfoObject(stream, m_info.value()))
+        {
+            return false;
+        }
     }
 
     size_t xrefOffset = 0;

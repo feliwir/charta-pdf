@@ -1,5 +1,4 @@
 #include "Writer.hpp"
-#include "Literals.hpp"
 #include <iomanip>
 #include <sstream>
 
@@ -49,13 +48,13 @@ bool charta::pdf::Writer::writeXRefTable(std::ostream &stream, const Document &d
         ss << std::setw(10) << std::setfill('0') << writeObj.write_pos;
         stream << ss.rdbuf();
 
-        stream.put(' ');
+        stream.put(PDF_SPACE);
 
         ss.clear();
         ss << std::setw(5) << std::setfill('0') << 0;
         stream << ss.rdbuf();
 
-        stream.put(' ');
+        stream.put(PDF_SPACE);
         stream.put('n');
         writeNewLine(stream);
     }
@@ -70,7 +69,7 @@ bool charta::pdf::Writer::writeXRefTableReference(std::ostream &stream, const si
         return false;
     }
 
-    if (!writeInteger(stream, tablePos))
+    if (!writeInteger(stream, tablePos,'\0'))
     {
         return false;
     }
@@ -100,10 +99,14 @@ bool charta::pdf::Writer::writeInfoObject(std::ostream &stream, const Info &info
     m_trailer.setInfo(object.id);
 
     std::map<std::string, DictValue> catalogDict;
-    if (!info.Author.empty())
-        catalogDict[PDF_DICT_KEY_INFO_AUTHOR] = LiteralString(info.Author);
     if (!info.Title.empty())
         catalogDict[PDF_DICT_KEY_INFO_TITLE] = LiteralString(info.Title);
+    if (!info.Author.empty())
+        catalogDict[PDF_DICT_KEY_INFO_AUTHOR] = LiteralString(info.Author);
+    if (!info.Subject.empty())
+        catalogDict[PDF_DICT_KEY_INFO_SUBJECT] = LiteralString(info.Subject);
+    if (!info.Keywords.empty())
+        catalogDict[PDF_DICT_KEY_INFO_KEYWORDS] = LiteralString(info.Keywords);
 
     if (!writeDictionary(stream, catalogDict))
     {
@@ -144,16 +147,16 @@ bool charta::pdf::Writer::writeInteger(std::ostream &stream, int value, char sep
 
 bool charta::pdf::Writer::writeLiteralString(std::ostream &stream, const LiteralString &value, char seperator)
 {
-    stream.put('(');
+    stream.put(PDF_LEFT_PARENTHESIS);
     stream.write(value.getContent().data(), value.getContent().size());
-    stream.put(')');
+    stream.put(PDF_RIGHT_PARENTHESIS);
 
     return writeSeperator(stream, seperator);
 }
 
 bool charta::pdf::Writer::writeComment(std::ostream &stream, std::string_view comment)
 {
-    stream.put(PDF_COMMENT_PREFIX);
+    stream.put(PDF_PERCENT_SIGN);
     stream.write(comment.data(), comment.size());
 
     return writeNewLine(stream);
@@ -168,7 +171,7 @@ bool charta::pdf::Writer::writeKeyword(std::ostream &stream, std::string_view ke
 
 bool charta::pdf::Writer::writeNewLine(std::ostream &stream)
 {
-    stream.write(PDF_NEWLINE, 2);
+    stream.write(PDF_EOL, sizeof(PDF_EOL));
     return !stream.bad();
 }
 
@@ -204,7 +207,7 @@ bool charta::pdf::Writer::writeDictionary(std::ostream &stream, const std::map<s
 
 bool charta::pdf::Writer::writeName(std::ostream &stream, std::string_view name, char seperator)
 {
-    stream.put(PDF_SLASH);
+    stream.put(PDF_SOLIDUS);
 
     // TODO: Escape ASCII 0-32
     stream.write(name.data(), name.size());
@@ -238,30 +241,30 @@ bool charta::pdf::Writer::writeValue(std::ostream &stream, const DictValue &valu
         if (!writeInteger(stream, std::get<int>(value), '\0'))
             return false;
     }
-    else if (std::holds_alternative<ObjectReference>(value))
+    else if (std::holds_alternative<IndirectObject>(value))
     {
         if (!writeSeperator(stream))
             return false;
-        if (!writeIndirectObject(stream, std::get<ObjectReference>(value)))
+        if (!writeIndirectObject(stream, std::get<IndirectObject>(value)))
             return false;
     }
     else if (std::holds_alternative<LiteralString>(value))
     {
-        if (!writeLiteralString(stream, std::get<LiteralString>(value)))
+        if (!writeLiteralString(stream, std::get<LiteralString>(value),'\0'))
             return false;
     }
     else
     {
         if (!writeSeperator(stream))
             return false;
-        if (!writeName(stream, std::get<std::string>(value), '\0'))
+        if (!writeName(stream, std::get<NameObject>(value), '\0'))
             return false;
     }
 
     return writeNewLine(stream);
 }
 
-bool charta::pdf::Writer::writeIndirectObject(std::ostream &stream, ObjectReference ref)
+bool charta::pdf::Writer::writeIndirectObject(std::ostream &stream, IndirectObject ref)
 {
     if (!writeInteger(stream, ref))
     {
@@ -282,7 +285,7 @@ bool charta::pdf::Writer::writeIndent(std::ostream &stream)
 {
     for (size_t l = 0; l < m_indentLevel; l++)
     {
-        stream.put(PDF_TABULATOR);
+        stream.put(PDF_HORIZONTAL_TAB);
     }
 
     return !stream.bad();

@@ -1,4 +1,4 @@
-#include <charta/PDFDocument.hpp>
+#include <charta/Document.hpp>
 #include <filesystem>
 #include <gtest/gtest.h>
 
@@ -8,6 +8,11 @@ TEST(Document, Write)
 {
     auto outFile = std::string(CHARTA_PDF_BINARY_PATH) + "/test_write.pdf";
 
-    PDFDocument doc;
-    EXPECT_TRUE(doc.saveTo(outFile));
+    Document doc;
+
+    Info info;
+    info.Author = "Stephan Vedder";
+    doc.setInfo(info);
+
+    EXPECT_TRUE(doc.saveToFile(outFile));
 }

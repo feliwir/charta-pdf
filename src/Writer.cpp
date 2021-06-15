@@ -88,11 +88,10 @@ bool charta::pdf::Writer::writePageTree(std::ostream &stream, const Document &do
     {
         writtenPages.emplace_back(startWriteObject(stream));
 
-        Array mediaBoxArr;
-        mediaBoxArr.emplace_back() = static_cast<IntegerObject>(page.getMediaBox().getLower().x());
-        mediaBoxArr.emplace_back() = static_cast<IntegerObject>(page.getMediaBox().getLower().y());
-        mediaBoxArr.emplace_back() = static_cast<IntegerObject>(page.getMediaBox().getUpper().x());
-        mediaBoxArr.emplace_back() = static_cast<IntegerObject>(page.getMediaBox().getUpper().y());
+        Array mediaBoxArr({static_cast<IntegerObject>(page.getMediaBox().getLower().x()),
+                           static_cast<IntegerObject>(page.getMediaBox().getLower().y()),
+                           static_cast<IntegerObject>(page.getMediaBox().getUpper().x()),
+                           static_cast<IntegerObject>(page.getMediaBox().getUpper().y())});
 
         Dictionary catalogDict;
         catalogDict[PDF_DICT_KEY_TYPE] = PDF_DICT_VALUE_TYPE_PAGE;

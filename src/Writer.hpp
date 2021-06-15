@@ -42,19 +42,19 @@ class Writer
 
   private:
     // Primitive writes
-    bool writeInteger(std::ostream &ostream, int value, char seperator = PDF_SPACE);
-    bool writeLiteralString(std::ostream &ostream, const LiteralString &value, char seperator = PDF_SPACE);
     bool writeComment(std::ostream &ostream, std::string_view comment);
     bool writeKeyword(std::ostream &ostream, std::string_view keyword);
     bool writeNewLine(std::ostream &ostream);
-    bool writeArray(std::ostream &ostream, const Array &arr);
-    bool writeDictionary(std::ostream &ostream, const Dictionary &dict);
     bool writeIndent(std::ostream &ostream);
-    bool writeName(std::ostream &ostream, std::string_view name, char seperator = PDF_SPACE);
-    bool writeIndirectObject(std::ostream &ostream, IndirectObject ref);
     bool writeSeperator(std::ostream &stream, char seperator = PDF_SPACE);
 
     // Object write
+    bool writeInteger(std::ostream &ostream, int value, char seperator = PDF_SPACE);
+    bool writeLiteralString(std::ostream &ostream, const LiteralString &value, char seperator = PDF_SPACE);
+    bool writeArray(std::ostream &ostream, const Array &arr);
+    bool writeDictionary(std::ostream &ostream, const Dictionary &dict);
+    bool writeName(std::ostream &ostream, std::string_view name, char seperator = PDF_SPACE);
+    bool writeIndirectObject(std::ostream &ostream, IndirectObject ref);
     bool writeObject(std::ostream &ostream, const Object &value);
 
     ObjectWriteInformation &allocateWriteObject();

@@ -11,6 +11,11 @@ class Array
     std::vector<Object> m_entries;
 
   public:
+    Array() = default;
+    Array(const std::vector<Object>& entries) : m_entries(entries)
+    {
+    }
+
     const Object &operator[](size_t index) const
     {
         return m_entries[index];

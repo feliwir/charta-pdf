@@ -13,6 +13,8 @@ constexpr const char PDF_SPACE = ' ';
 // Delimiters
 constexpr const char PDF_LEFT_PARENTHESIS = '(';
 constexpr const char PDF_RIGHT_PARENTHESIS = ')';
+constexpr const char PDF_LEFT_SQUARE_BRACKET = '[';
+constexpr const char PDF_RIGHT_SQUARE_BRACKET = ']';
 constexpr const char PDF_LESS_THAN = '<';
 constexpr const char PDF_GREATER_THAN = '>';
 constexpr const char PDF_SOLIDUS = '/';
@@ -39,6 +41,9 @@ constexpr const char PDF_DICT_END[] = {PDF_GREATER_THAN, PDF_GREATER_THAN, '\0'}
 constexpr const char *PDF_DICT_KEY_PARENT = "Parent";
 constexpr const char *PDF_DICT_KEY_SIZE = "Size";
 constexpr const char *PDF_DICT_KEY_TYPE = "Type";
+constexpr const char *PDF_DICT_KEY_COUNT = "Count";
+constexpr const char *PDF_DICT_KEY_KIDS = "Kids";
+constexpr const char *PDF_DICT_KEY_MEDIABOX = "MediaBox";
 
 // Trailer references
 constexpr const char *PDF_DICT_KEY_ROOT = "Root";

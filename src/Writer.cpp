@@ -77,7 +77,7 @@ bool charta::pdf::Writer::writeXRefTableReference(std::ostream &stream, const si
     return writeNewLine(stream);
 }
 
-bool charta::pdf::Writer::writePagesTree(std::ostream &stream, const Document &doc)
+bool charta::pdf::Writer::writePageTree(std::ostream &stream, const Document &doc)
 {
     // No reference here, since it will be invalidated later
     auto pageTree = allocateWriteObject();
@@ -88,9 +88,16 @@ bool charta::pdf::Writer::writePagesTree(std::ostream &stream, const Document &d
     {
         writtenPages.emplace_back(startWriteObject(stream));
 
-        std::map<std::string, DictValue> catalogDict;
+        Array mediaBoxArr;
+        mediaBoxArr.emplace_back() = static_cast<IntegerObject>(page.getMediaBox().getLower().x());
+        mediaBoxArr.emplace_back() = static_cast<IntegerObject>(page.getMediaBox().getLower().y());
+        mediaBoxArr.emplace_back() = static_cast<IntegerObject>(page.getMediaBox().getUpper().x());
+        mediaBoxArr.emplace_back() = static_cast<IntegerObject>(page.getMediaBox().getUpper().y());
+
+        Dictionary catalogDict;
         catalogDict[PDF_DICT_KEY_TYPE] = PDF_DICT_VALUE_TYPE_PAGE;
         catalogDict[PDF_DICT_KEY_PARENT] = pageTree.id;
+        catalogDict[PDF_DICT_KEY_MEDIABOX] = mediaBoxArr;
 
         if (!writeDictionary(stream, catalogDict))
         {
@@ -108,13 +115,23 @@ bool charta::pdf::Writer::writePagesTree(std::ostream &stream, const Document &d
 
     startWriteObject(stream, pageTreeRef);
 
-    std::map<std::string, DictValue> catalogDict;
+    Array pagesArr;
+    for (auto &page : writtenPages)
+    {
+        pagesArr.emplace_back() = page.id;
+    }
+
+    Dictionary catalogDict;
     catalogDict[PDF_DICT_KEY_TYPE] = PDF_DICT_VALUE_TYPE_PAGES;
+    catalogDict[PDF_DICT_KEY_COUNT] = static_cast<IntegerObject>(writtenPages.size());
+    catalogDict[PDF_DICT_KEY_KIDS] = pagesArr;
 
     if (!writeDictionary(stream, catalogDict))
     {
         return false;
     }
+
+    m_catalog.setPages(pageTree.id);
 
     return endWriteObject(stream);
 }
@@ -124,8 +141,13 @@ bool charta::pdf::Writer::writeCatalogObject(std::ostream &stream)
     auto &object = startWriteObject(stream);
     m_trailer.setRoot(object.id);
 
-    std::map<std::string, DictValue> catalogDict;
+    Dictionary catalogDict;
     catalogDict[PDF_DICT_KEY_TYPE] = PDF_DICT_VALUE_TYPE_CATALOG;
+
+    if (m_catalog.getPages().has_value())
+    {
+        catalogDict[PDF_DICT_VALUE_TYPE_PAGES] = m_catalog.getPages().value();
+    }
 
     if (!writeDictionary(stream, catalogDict))
     {
@@ -140,7 +162,7 @@ bool charta::pdf::Writer::writeInfoObject(std::ostream &stream, const Info &info
     auto &object = startWriteObject(stream);
     m_trailer.setInfo(object.id);
 
-    std::map<std::string, DictValue> catalogDict;
+    Dictionary catalogDict;
     if (!info.Title.empty())
         catalogDict[PDF_DICT_KEY_INFO_TITLE] = LiteralString(info.Title);
     if (!info.Author.empty())
@@ -165,7 +187,7 @@ bool charta::pdf::Writer::writeTrailer(std::ostream &stream)
         return false;
     }
 
-    std::map<std::string, DictValue> trailerDict;
+    Dictionary trailerDict;
     trailerDict[PDF_DICT_KEY_SIZE] = 0;
     trailerDict[PDF_DICT_KEY_ROOT] = m_trailer.getRoot();
     if (m_trailer.getInfo().has_value())
@@ -217,7 +239,26 @@ bool charta::pdf::Writer::writeNewLine(std::ostream &stream)
     return !stream.bad();
 }
 
-bool charta::pdf::Writer::writeDictionary(std::ostream &stream, const std::map<std::string, DictValue> &dict)
+bool charta::pdf::Writer::writeArray(std::ostream &stream, const Array &arr)
+{
+    stream.put(PDF_LEFT_SQUARE_BRACKET);
+
+    for (size_t i = 0; i < arr.size(); i++)
+    {
+        const auto &obj = arr[i];
+        if (!writeObject(stream, obj))
+            return false;
+        // The last element doesn't need a seperator
+        if (i < (arr.size() - 1) && !writeSeperator(stream))
+            return false;
+    }
+
+    stream.put(PDF_RIGHT_SQUARE_BRACKET);
+
+    return !stream.bad();
+}
+
+bool charta::pdf::Writer::writeDictionary(std::ostream &stream, const Dictionary &dict)
 {
     if (!writeIndent(stream))
     {
@@ -233,8 +274,26 @@ bool charta::pdf::Writer::writeDictionary(std::ostream &stream, const std::map<s
 
     for (const auto &keyValue : dict)
     {
-        writeKey(stream, keyValue.first);
-        writeValue(stream, keyValue.second);
+        if (!writeIndent(stream))
+        {
+            return false;
+        }
+        if (!writeObject(stream, keyValue.first))
+        {
+            return false;
+        }
+        if (!writeSeperator(stream))
+        {
+            return false;
+        }
+        if (!writeObject(stream, keyValue.second))
+        {
+            return false;
+        }
+        if (!writeNewLine(stream))
+        {
+            return false;
+        }
     }
 
     m_indentLevel--;
@@ -257,16 +316,6 @@ bool charta::pdf::Writer::writeName(std::ostream &stream, std::string_view name,
     return writeSeperator(stream, seperator);
 }
 
-bool charta::pdf::Writer::writeKey(std::ostream &stream, std::string_view key)
-{
-    if (!writeIndent(stream))
-    {
-        return false;
-    }
-
-    return writeName(stream, key, '\0');
-}
-
 bool charta::pdf::Writer::writeSeperator(std::ostream &stream, char seperator)
 {
     if (seperator)
@@ -274,19 +323,15 @@ bool charta::pdf::Writer::writeSeperator(std::ostream &stream, char seperator)
     return !stream.bad();
 }
 
-bool charta::pdf::Writer::writeValue(std::ostream &stream, const DictValue &value)
+bool charta::pdf::Writer::writeObject(std::ostream &stream, const Object &value)
 {
-    if (std::holds_alternative<int>(value))
+    if (std::holds_alternative<IntegerObject>(value))
     {
-        if (!writeSeperator(stream))
-            return false;
-        if (!writeInteger(stream, std::get<int>(value), '\0'))
+        if (!writeInteger(stream, std::get<IntegerObject>(value), '\0'))
             return false;
     }
     else if (std::holds_alternative<IndirectObject>(value))
     {
-        if (!writeSeperator(stream))
-            return false;
         if (!writeIndirectObject(stream, std::get<IndirectObject>(value)))
             return false;
     }
@@ -295,15 +340,27 @@ bool charta::pdf::Writer::writeValue(std::ostream &stream, const DictValue &valu
         if (!writeLiteralString(stream, std::get<LiteralString>(value), '\0'))
             return false;
     }
-    else
+    else if (std::holds_alternative<Array>(value))
     {
-        if (!writeSeperator(stream))
+        if (!writeArray(stream, std::get<Array>(value)))
             return false;
+    }
+    else if (std::holds_alternative<Dictionary>(value))
+    {
+        if (!writeDictionary(stream, std::get<Dictionary>(value)))
+            return false;
+    }
+    else if (std::holds_alternative<NameObject>(value))
+    {
         if (!writeName(stream, std::get<NameObject>(value), '\0'))
             return false;
     }
+    else
+    {
+        return false;
+    }
 
-    return writeNewLine(stream);
+    return true;
 }
 
 bool charta::pdf::Writer::writeIndirectObject(std::ostream &stream, IndirectObject ref)

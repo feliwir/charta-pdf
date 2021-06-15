@@ -6,15 +6,15 @@ namespace charta::pdf
 template <class T> class Vector2
 {
   private:
-    T m_x = 0;
-    T m_y = 0;
+    const T m_x = 0;
+    const T m_y = 0;
 
   public:
     inline Vector2() = default;
     inline Vector2(T v) : m_x(v), m_y(v)
     {
     }
-    inline Vector2(T x, T y) : m_x(x), m_y(y)
+    inline constexpr Vector2(T x, T y) : m_x(x), m_y(y)
     {
     }
 
@@ -23,11 +23,11 @@ template <class T> class Vector2
         return std::to_string(m_x) + "." + std::to_string(m_y);
     }
 
-    inline T &x()
+    inline const T &x() const
     {
         return m_x;
     }
-    inline T &y()
+    inline const T &y() const
     {
         return m_y;
     }

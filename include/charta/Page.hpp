@@ -1,5 +1,5 @@
 #pragma once
-#include "Rectangle.hpp"
+#include "PagePresets.hpp"
 
 namespace charta::pdf
 {
@@ -9,8 +9,13 @@ class Page
     Rectangleu m_mediaBox;
 
   public:
-    Page(const Rectangleu &mediaBox = {{0u, 0u}, {600u, 600u}}) : m_mediaBox(mediaBox)
+    Page(const Rectangleu &mediaBox = presets::A4Paper_Portrait) : m_mediaBox(mediaBox)
     {
+    }
+
+    const Rectangleu &getMediaBox() const
+    {
+        return m_mediaBox;
     }
 };
 } // namespace charta::pdf

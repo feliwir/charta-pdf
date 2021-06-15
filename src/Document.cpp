@@ -24,7 +24,7 @@ bool charta::pdf::Document::saveToStream(std::ostream &stream)
 
     if (!getPages().empty())
     {
-        if (!writer.writePagesTree(stream, *this))
+        if (!writer.writePageTree(stream, *this))
         {
             return false;
         }

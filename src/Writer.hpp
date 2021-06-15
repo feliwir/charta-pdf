@@ -33,6 +33,7 @@ class Writer
     // Trailer
     bool writeTrailer(std::ostream &ostream);
 
+    bool writePagesTree(std::ostream &ostream, const Document &doc);
     bool writeCatalogObject(std::ostream &ostream);
     bool writeInfoObject(std::ostream &ostream, const Info &info);
 
@@ -53,6 +54,7 @@ class Writer
 
     ObjectWriteInformation &allocateWriteObject();
     ObjectWriteInformation &startWriteObject(std::ostream &stream);
+    ObjectWriteInformation &startWriteObject(std::ostream &stream, ObjectWriteInformation &writeInformation);
     bool endWriteObject(std::ostream &stream);
 };
 } // namespace charta::pdf

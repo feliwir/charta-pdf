@@ -69,12 +69,54 @@ bool charta::pdf::Writer::writeXRefTableReference(std::ostream &stream, const si
         return false;
     }
 
-    if (!writeInteger(stream, tablePos,'\0'))
+    if (!writeInteger(stream, tablePos, '\0'))
     {
         return false;
     }
 
     return writeNewLine(stream);
+}
+
+bool charta::pdf::Writer::writePagesTree(std::ostream &stream, const Document &doc)
+{
+    // No reference here, since it will be invalidated later
+    auto pageTree = allocateWriteObject();
+
+    // Write pages
+    std::vector<ObjectWriteInformation> writtenPages;
+    for (const auto &page : doc.getPages())
+    {
+        writtenPages.emplace_back(startWriteObject(stream));
+
+        std::map<std::string, DictValue> catalogDict;
+        catalogDict[PDF_DICT_KEY_TYPE] = PDF_DICT_VALUE_TYPE_PAGE;
+        catalogDict[PDF_DICT_KEY_PARENT] = pageTree.id;
+
+        if (!writeDictionary(stream, catalogDict))
+        {
+            return false;
+        }
+
+        if (!endWriteObject(stream))
+        {
+            return false;
+        }
+    }
+
+    // Write pages tree
+    auto &pageTreeRef = m_writeObjects[pageTree.id];
+
+    startWriteObject(stream, pageTreeRef);
+
+    std::map<std::string, DictValue> catalogDict;
+    catalogDict[PDF_DICT_KEY_TYPE] = PDF_DICT_VALUE_TYPE_PAGES;
+
+    if (!writeDictionary(stream, catalogDict))
+    {
+        return false;
+    }
+
+    return endWriteObject(stream);
 }
 
 bool charta::pdf::Writer::writeCatalogObject(std::ostream &stream)
@@ -83,7 +125,7 @@ bool charta::pdf::Writer::writeCatalogObject(std::ostream &stream)
     m_trailer.setRoot(object.id);
 
     std::map<std::string, DictValue> catalogDict;
-    catalogDict[PDF_DICT_KEY_TYPE] = PDF_DICT_VALUE_CATALOG;
+    catalogDict[PDF_DICT_KEY_TYPE] = PDF_DICT_VALUE_TYPE_CATALOG;
 
     if (!writeDictionary(stream, catalogDict))
     {
@@ -250,7 +292,7 @@ bool charta::pdf::Writer::writeValue(std::ostream &stream, const DictValue &valu
     }
     else if (std::holds_alternative<LiteralString>(value))
     {
-        if (!writeLiteralString(stream, std::get<LiteralString>(value),'\0'))
+        if (!writeLiteralString(stream, std::get<LiteralString>(value), '\0'))
             return false;
     }
     else
@@ -293,15 +335,20 @@ bool charta::pdf::Writer::writeIndent(std::ostream &stream)
 
 charta::pdf::ObjectWriteInformation &charta::pdf::Writer::startWriteObject(std::ostream &stream)
 {
-    auto &obj = allocateWriteObject();
-    obj.write_pos = stream.tellp();
-    obj.written = true;
+    return startWriteObject(stream, allocateWriteObject());
+}
 
-    writeInteger(stream, obj.id);
+charta::pdf::ObjectWriteInformation &charta::pdf::Writer::startWriteObject(std::ostream &stream,
+                                                                           ObjectWriteInformation &writeInfo)
+{
+    writeInfo.write_pos = stream.tellp();
+    writeInfo.written = true;
+
+    writeInteger(stream, writeInfo.id);
     writeInteger(stream, 0);
     writeKeyword(stream, PDF_KEYWORD_OBJECT);
 
-    return obj;
+    return writeInfo;
 }
 
 bool charta::pdf::Writer::endWriteObject(std::ostream &stream)

@@ -1,8 +1,10 @@
 #pragma once
 #include <optional>
 #include <string_view>
+#include <vector>
 
 #include "Info.hpp"
+#include "Page.hpp"
 #include "Vector2.hpp"
 
 namespace charta::pdf
@@ -13,6 +15,7 @@ class Document
   private:
     PDFVersion m_version;
     std::optional<Info> m_info;
+    std::vector<Page> m_pages;
 
   public:
     Document(PDFVersion version = {1, 3}) : m_version(version)
@@ -24,9 +27,19 @@ class Document
         m_info = info;
     }
 
-    inline std::optional<Info> getInfo()
+    inline std::optional<Info> getInfo() const
     {
         return m_info;
+    }
+
+    inline const std::vector<Page> getPages() const
+    {
+        return m_pages;
+    }
+
+    inline void addPage(const Page &page)
+    {
+        m_pages.emplace_back(page);
     }
 
     bool saveToStream(std::ostream &stream);

@@ -4,9 +4,9 @@
 
 using namespace charta::pdf;
 
-TEST(Document, Write)
+TEST(Document, EmptyWrite)
 {
-    auto outFile = std::string(CHARTA_PDF_BINARY_PATH) + "/test_write.pdf";
+    auto outFile = std::string(CHARTA_PDF_BINARY_PATH) + "/test_empty_write.pdf";
 
     Document doc;
 
@@ -15,6 +15,18 @@ TEST(Document, Write)
     info.Subject = "Testing";
     info.Author = "Stephan Vedder";
     doc.setInfo(info);
+
+    EXPECT_TRUE(doc.saveToFile(outFile));
+}
+
+TEST(Document, PageWrite)
+{
+    auto outFile = std::string(CHARTA_PDF_BINARY_PATH) + "/test_page_write.pdf";
+
+    Document doc;
+
+    Page first;
+    doc.addPage(first);
 
     EXPECT_TRUE(doc.saveToFile(outFile));
 }

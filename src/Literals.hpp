@@ -36,6 +36,7 @@ constexpr const char PDF_DICT_START[] = {PDF_LESS_THAN, PDF_LESS_THAN, '\0'};
 constexpr const char PDF_DICT_END[] = {PDF_GREATER_THAN, PDF_GREATER_THAN, '\0'};
 
 // Keys
+constexpr const char *PDF_DICT_KEY_PARENT = "Parent";
 constexpr const char *PDF_DICT_KEY_SIZE = "Size";
 constexpr const char *PDF_DICT_KEY_TYPE = "Type";
 
@@ -52,6 +53,8 @@ constexpr const char *PDF_DICT_KEY_INFO_CREATOR = "Creator";
 constexpr const char *PDF_DICT_KEY_INFO_PRODUCER = "Producer";
 
 // Dictionary types
-constexpr const char *PDF_DICT_VALUE_CATALOG = "Catalog";
+constexpr const char *PDF_DICT_VALUE_TYPE_PAGE = "Page";
+constexpr const char *PDF_DICT_VALUE_TYPE_PAGES = "Pages";
+constexpr const char *PDF_DICT_VALUE_TYPE_CATALOG = "Catalog";
 
 } // namespace charta::pdf

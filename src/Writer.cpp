@@ -104,7 +104,7 @@ bool charta::pdf::Writer::writePagesTree(std::ostream &stream, const Document &d
     }
 
     // Write pages tree
-    auto &pageTreeRef = m_writeObjects[pageTree.id];
+    auto &pageTreeRef = m_writeObjects[pageTree.id - 1];
 
     startWriteObject(stream, pageTreeRef);
 

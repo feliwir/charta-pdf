@@ -4,7 +4,7 @@ if(BUILD_COVERAGE)
     setup_target_for_coverage_lcov(
         NAME charta_pdf_coverage
         EXECUTABLE ctest -j ${n_cores}
-        EXCLUDE "contrib/*" "test/*" "/usr/include/*"
+        EXCLUDE "contrib/*" "test/*" "bench/*" "/usr/include/*"
         DEPENDENCIES charta_pdf_tests)
 endif()
 

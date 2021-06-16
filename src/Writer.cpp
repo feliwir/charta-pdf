@@ -2,6 +2,12 @@
 #include <iomanip>
 #include <sstream>
 
+charta::pdf::Writer::Writer()
+{
+    auto& headObj = allocateWriteObject();
+    headObj.generation = std::numeric_limits<uint16_t>::max();
+}
+
 bool charta::pdf::Writer::writeHeader(std::ostream &stream, const Document &doc)
 {
     // Write a comment containing the PDF version
@@ -41,21 +47,38 @@ bool charta::pdf::Writer::writeXRefTable(std::ostream &stream, const Document &d
         return false;
     }
 
+    if (!writeInteger(stream, 0))
+    {
+        return false;
+    }
+
+    if (!writeInteger(stream, m_writeObjects.size() , '\0'))
+    {
+        return false;
+    }
+
+    if (!writeNewLine(stream))
+    {
+        return false;
+    }
+
     for (const auto &writeObj : m_writeObjects)
     {
-        // write obj position
+        // Object stream position
         std::stringstream ss;
         ss << std::setw(10) << std::setfill('0') << writeObj.write_pos;
         stream << ss.rdbuf();
 
         stream.put(PDF_SPACE);
 
+        // Generation number
         ss.clear();
-        ss << std::setw(5) << std::setfill('0') << 0;
+        ss << std::setw(5) << std::setfill('0') << writeObj.generation;
         stream << ss.rdbuf();
 
+        // Free or used
         stream.put(PDF_SPACE);
-        stream.put('n');
+        stream.put(writeObj.written ? 'n' : 'f');
         writeNewLine(stream);
     }
 
@@ -110,7 +133,7 @@ bool charta::pdf::Writer::writePageTree(std::ostream &stream, const Document &do
     }
 
     // Write pages tree
-    auto &pageTreeRef = m_writeObjects[pageTree.id - 1];
+    auto &pageTreeRef = m_writeObjects[pageTree.id];
 
     startWriteObject(stream, pageTreeRef);
 
@@ -187,7 +210,7 @@ bool charta::pdf::Writer::writeTrailer(std::ostream &stream)
     }
 
     Dictionary trailerDict;
-    trailerDict[PDF_DICT_KEY_SIZE] = 0;
+    trailerDict[PDF_DICT_KEY_SIZE] = static_cast<IntegerObject>(m_writeObjects.size());
     trailerDict[PDF_DICT_KEY_ROOT] = m_trailer.getRoot();
     if (m_trailer.getInfo().has_value())
         trailerDict[PDF_DICT_KEY_INFO] = m_trailer.getInfo().value();
@@ -415,6 +438,6 @@ bool charta::pdf::Writer::endWriteObject(std::ostream &stream)
 charta::pdf::ObjectWriteInformation &charta::pdf::Writer::allocateWriteObject()
 {
     auto &obj = m_writeObjects.emplace_back();
-    obj.id = m_writeObjects.size();
+    obj.id = m_writeObjects.size() -1;
     return obj;
 }

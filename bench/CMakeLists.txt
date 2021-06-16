@@ -1,0 +1,2 @@
+add_executable(charta_pdf_bench BenchWrite.cpp)
+target_link_libraries(charta_pdf_bench PRIVATE charta_pdf benchmark::benchmark benchmark::benchmark_main)

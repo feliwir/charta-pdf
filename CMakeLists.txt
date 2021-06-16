@@ -9,6 +9,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules" ${CMAKE_MODULE_PATH})
 
 option(BUILD_COVERAGE "Build coverage" OFF)
 option(BUILD_TESTING "Build tests" ON)
+option(BUILD_BENCHMARK "Build benchmarks" ON)
 option(BUILD_USE_SANITIZER "Use address sanitizer to find any memory leaks" OFF)
 option(BUILD_APPS "Build applications" ON)
 
@@ -28,4 +29,8 @@ add_subdirectory(src)
 if(BUILD_TESTING)
     enable_testing()
     add_subdirectory(test)
+endif()
+
+if(BUILD_BENCHMARK)
+    add_subdirectory(bench)
 endif()

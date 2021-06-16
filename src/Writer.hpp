@@ -25,6 +25,8 @@ class Writer
     Catalog m_catalog;
 
   public:
+    Writer();
+
     // Header & EOF
     bool writeHeader(std::ostream &ostream, const Document &doc);
     bool writeEndOfFile(std::ostream &ostream);

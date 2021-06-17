@@ -33,7 +33,7 @@ class ObjectWriter
     ObjectWriteInformation &startWriteObject(std::ostream &stream, ObjectWriteInformation &writeInformation);
     bool endWriteObject(std::ostream &stream);
 
-    inline const std::vector<ObjectWriteInformation> &getObjects()
+    inline std::vector<ObjectWriteInformation> &getObjects()
     {
         return m_writeObjects;
     }

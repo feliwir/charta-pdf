@@ -6,12 +6,9 @@
 
 #include "Catalog.hpp"
 #include "Literals.hpp"
-#include "ObjectWriteInfo.hpp"
 #include "Trailer.hpp"
-#include "objects/Array.hpp"
-#include "objects/Dictionary.hpp"
-#include "objects/IndirectObject.hpp"
-#include "objects/LiteralString.hpp"
+#include "write/ObjectWriter.hpp"
+#include "write/PrimitiveWriter.hpp"
 
 namespace charta::pdf
 {
@@ -19,8 +16,9 @@ namespace charta::pdf
 class Writer
 {
   private:
-    std::vector<ObjectWriteInformation> m_writeObjects;
-    size_t m_indentLevel = 0;
+    PrimitiveWriter m_primWriter;
+    ObjectWriter m_objWriter;
+
     Trailer m_trailer;
     Catalog m_catalog;
 
@@ -41,27 +39,5 @@ class Writer
     bool writePageTree(std::ostream &ostream, const Document &doc);
     bool writeCatalogObject(std::ostream &ostream);
     bool writeInfoObject(std::ostream &ostream, const Info &info);
-
-  private:
-    // Primitive writes
-    bool writeComment(std::ostream &ostream, std::string_view comment);
-    bool writeKeyword(std::ostream &ostream, std::string_view keyword);
-    bool writeNewLine(std::ostream &ostream);
-    bool writeIndent(std::ostream &ostream);
-    bool writeSeperator(std::ostream &stream, char seperator = PDF_SPACE);
-
-    // Object write
-    bool writeInteger(std::ostream &ostream, int value, char seperator = PDF_SPACE);
-    bool writeLiteralString(std::ostream &ostream, const LiteralString &value, char seperator = PDF_SPACE);
-    bool writeArray(std::ostream &ostream, const Array &arr);
-    bool writeDictionary(std::ostream &ostream, const Dictionary &dict);
-    bool writeName(std::ostream &ostream, std::string_view name, char seperator = PDF_SPACE);
-    bool writeIndirectObject(std::ostream &ostream, IndirectObject ref);
-    bool writeObject(std::ostream &ostream, const Object &value);
-
-    ObjectWriteInformation &allocateWriteObject();
-    ObjectWriteInformation &startWriteObject(std::ostream &stream);
-    ObjectWriteInformation &startWriteObject(std::ostream &stream, ObjectWriteInformation &writeInformation);
-    bool endWriteObject(std::ostream &stream);
 };
 } // namespace charta::pdf

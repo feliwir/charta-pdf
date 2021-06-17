@@ -12,7 +12,7 @@ class Array
 
   public:
     Array() = default;
-    Array(const std::vector<Object>& entries) : m_entries(entries)
+    Array(const std::vector<Object> &entries) : m_entries(entries)
     {
     }
 

@@ -66,3 +66,13 @@ bool charta::pdf::Document::saveToStream(std::ostream &stream)
 
     return true;
 }
+
+charta::pdf::Font& charta::pdf::Document::addFontFromFile(std::string_view path, bool embed)
+{
+
+}
+
+charta::pdf::Font& charta::pdf::Document::addFontFromStream(std::istream &stream, bool embed)
+{
+
+}

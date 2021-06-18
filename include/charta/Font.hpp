@@ -12,6 +12,7 @@ class Font
   private:
     FontType m_subtype;
     FontDescriptor m_descriptor;
+    bool embed;
   public:
     Font(FontType subtype);
 };

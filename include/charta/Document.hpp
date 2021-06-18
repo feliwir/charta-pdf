@@ -3,6 +3,7 @@
 #include <string_view>
 #include <vector>
 
+#include "Font.hpp"
 #include "Info.hpp"
 #include "Page.hpp"
 #include "Vector2.hpp"
@@ -16,10 +17,16 @@ class Document
     PDFVersion m_version;
     std::optional<Info> m_info;
     std::vector<Page> m_pages;
+    std::vector<Font> m_fonts;
 
   public:
     Document(PDFVersion version = {1, 3}) : m_version(version)
     {
+    }
+
+    inline const PDFVersion &getVersion() const
+    {
+        return m_version;
     }
 
     inline void setInfo(const Info &info)
@@ -32,6 +39,11 @@ class Document
         return m_info;
     }
 
+    // Fonts
+    bool addFontFromStream(std::istream &stream, bool embed = true);
+    bool addFontFromFile(std::string_view filepath, bool embed = true);
+
+    // Pages
     inline const std::vector<Page> getPages() const
     {
         return m_pages;
@@ -42,12 +54,8 @@ class Document
         m_pages.emplace_back(page);
     }
 
+    // Saving
     bool saveToStream(std::ostream &stream);
     bool saveToFile(std::string_view filepath);
-
-    inline const PDFVersion &getVersion() const
-    {
-        return m_version;
-    }
 };
 } // namespace charta::pdf

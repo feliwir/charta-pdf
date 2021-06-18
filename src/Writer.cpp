@@ -18,7 +18,7 @@ bool charta::pdf::Writer::writeHeader(std::ostream &stream, const Document &doc)
     }
 
     // Indicates that this PDF contains binary data
-    const std::string binary_comment = "\xbd\xbe\xbc";
+    const std::string binary_comment = "\xbd\xbe\xbc\xbd";
     if (!m_primWriter.writeComment(stream, binary_comment))
     {
         return false;

@@ -14,6 +14,8 @@ class Font
     bool m_embed;
 
   public:
+    virtual ~Font() {};
+
     virtual short getAscent() = 0;
     virtual short getDescent() = 0;
     virtual FontType getSubtype() = 0;

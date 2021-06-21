@@ -25,6 +25,8 @@ class Document
     {
     }
 
+    ~Document();
+
     inline const PDFVersion &getVersion() const
     {
         return m_version;

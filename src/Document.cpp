@@ -4,6 +4,15 @@
 #include "fonts/FreetypeHelper.hpp"
 #include <fstream>
 
+charta::pdf::Document::~Document()
+{
+    for(auto & font : m_fonts)
+    {
+        delete font;
+        font = nullptr;
+    }
+}
+
 bool charta::pdf::Document::saveToFile(std::string_view filepath)
 {
     std::ofstream fout(filepath.data(), std::ios::binary);

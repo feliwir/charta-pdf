@@ -96,7 +96,5 @@ charta::pdf::Font *charta::pdf::Document::addFontFromStream(std::istream &stream
     auto data = new uint8_t[size];
     stream.read((char *)data, size);
 
-    std::vector<uint8_t> data_vec(data, data + size);
-
-    return m_fonts.emplace_back(FreetypeHelper::loadFontFromMemory(data_vec));
+    return m_fonts.emplace_back(FreetypeHelper::loadFontFromMemory(data, size));
 }

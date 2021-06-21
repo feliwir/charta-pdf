@@ -9,7 +9,7 @@ namespace charta::pdf
 class FreetypeHelper
 {
   public:
-    static Font *loadFontFromMemory(const std::vector<uint8_t> &data);
+    static Font *loadFontFromMemory(uint8_t* data, size_t size);
 
   private:
     static bool initLibrary();

@@ -17,6 +17,6 @@ class Font
     virtual short getAscent() = 0;
     virtual short getDescent() = 0;
     virtual FontType getSubtype() = 0;
-    virtual std::string_view getFontName() = 0;
+    virtual const char* getFontName() = 0;
 };
 } // namespace charta::pdf

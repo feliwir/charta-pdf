@@ -9,7 +9,7 @@ bool charta::pdf::FreetypeHelper::initLibrary()
     return error == 0;
 }
 
-charta::pdf::Font *charta::pdf::FreetypeHelper::loadFontFromMemory(const std::vector<uint8_t> &data)
+charta::pdf::Font *charta::pdf::FreetypeHelper::loadFontFromMemory(uint8_t *data, size_t size)
 {
     if (!initLibrary())
     {
@@ -17,9 +17,9 @@ charta::pdf::Font *charta::pdf::FreetypeHelper::loadFontFromMemory(const std::ve
     }
 
     FT_Face face;
-    auto error = FT_New_Memory_Face(s_library, data.data(), /* first byte in memory */
-                                    data.size(),            /* size in bytes        */
-                                    0,                      /* face_index           */
+    auto error = FT_New_Memory_Face(s_library, data, /* first byte in memory */
+                                    size,            /* size in bytes        */
+                                    0,               /* face_index           */
                                     &face);
 
     if (error)
@@ -27,5 +27,5 @@ charta::pdf::Font *charta::pdf::FreetypeHelper::loadFontFromMemory(const std::ve
         return nullptr;
     }
 
-    return new FreetypeFont(face);
+    return new FreetypeFont(face, data, size);
 }

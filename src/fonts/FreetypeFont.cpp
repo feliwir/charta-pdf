@@ -1,7 +1,8 @@
 #include "FreetypeFont.hpp"
 #include <iostream>
 
-charta::pdf::FreetypeFont::FreetypeFont(FT_Face face) : m_face(face)
+charta::pdf::FreetypeFont::FreetypeFont(FT_Face face, uint8_t *data, size_t size)
+    : m_face(face), m_data(data, data + size)
 {
     auto type = std::string(FT_Get_Font_Format(face));
 
@@ -9,6 +10,11 @@ charta::pdf::FreetypeFont::FreetypeFont(FT_Face face) : m_face(face)
     {
         m_subtype = FontType::TrueType;
     }
+}
+
+charta::pdf::FreetypeFont::~FreetypeFont()
+{
+    FT_Done_Face(m_face);
 }
 
 charta::pdf::FontType charta::pdf::FreetypeFont::getSubtype()
@@ -26,8 +32,8 @@ short charta::pdf::FreetypeFont::getDescent()
     return m_face->descender;
 }
 
-std::string_view charta::pdf::FreetypeFont::getFontName()
+const char *charta::pdf::FreetypeFont::getFontName()
 {
-    auto name = FT_Get_Postscript_Name(m_face);
+    const char *name = FT_Get_Postscript_Name(m_face);
     return name;
 }

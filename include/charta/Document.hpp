@@ -1,7 +1,7 @@
 #pragma once
+#include <list>
 #include <optional>
 #include <string_view>
-#include <list>
 #include <vector>
 
 #include "Font.hpp"
@@ -18,7 +18,7 @@ class Document
     PDFVersion m_version;
     std::optional<Info> m_info;
     std::vector<Page> m_pages;
-    std::list<Font> m_fonts;
+    std::list<Font *> m_fonts;
 
   public:
     Document(PDFVersion version = {1, 3}) : m_version(version)
@@ -41,8 +41,8 @@ class Document
     }
 
     // Fonts
-    Font& addFontFromStream(std::istream &stream, bool embed = true);
-    Font& addFontFromFile(std::string_view filepath, bool embed = true);
+    Font *addFontFromStream(std::istream &stream, bool embed = true);
+    Font *addFontFromFile(std::string_view filepath, bool embed = true);
 
     // Pages
     inline const std::vector<Page> getPages() const

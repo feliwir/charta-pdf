@@ -1,4 +1,4 @@
-add_executable(charta_pdf_tests TestWrite.cpp)
+add_executable(charta_pdf_tests TestFont.cpp TestWrite.cpp)
 
 if(BUILD_COVERAGE)
     setup_target_for_coverage_lcov(

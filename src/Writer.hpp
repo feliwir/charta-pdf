@@ -1,5 +1,7 @@
 #pragma once
 #include <charta/Document.hpp>
+#include <charta/Font.hpp>
+
 #include <ostream>
 #include <string_view>
 #include <vector>
@@ -36,6 +38,7 @@ class Writer
     // Trailer
     bool writeTrailer(std::ostream &ostream);
 
+    bool writeFontDefinitions(std::ostream &ostream, std::list<Font *> fonts);
     bool writePageTree(std::ostream &ostream, const Document &doc);
     bool writeCatalogObject(std::ostream &ostream);
     bool writeInfoObject(std::ostream &ostream, const Info &info);

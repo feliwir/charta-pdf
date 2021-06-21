@@ -100,6 +100,69 @@ bool charta::pdf::Writer::writeXRefTableReference(std::ostream &stream, const si
     return m_primWriter.writeNewLine(stream);
 }
 
+// TODO: only write the fonts that are actual in use
+bool charta::pdf::Writer::writeFontDefinitions(std::ostream &stream, std::list<Font *> fonts)
+{
+    for (const auto &font : fonts)
+    {
+        m_objWriter.startWriteObject(stream);
+
+        NameObject subtype;
+
+        switch (font->getSubtype())
+        {
+        case FontType::TrueType:
+            subtype = "TrueType";
+            break;
+        default:
+            return false;
+        }
+
+        auto descriptor = m_objWriter.allocateWriteObject();
+
+        Dictionary fontDict;
+        fontDict[PDF_DICT_KEY_TYPE] = PDF_DICT_VALUE_TYPE_FONT;
+        fontDict[PDF_DICT_KEY_SUBTYPE] = subtype;
+        fontDict[PDF_DICT_VALUE_TYPE_FONTDESCRIPTOR] = descriptor.id;
+        fontDict[PDF_DICT_KEY_BASEFONT] = NameObject(font->getFontName());
+
+        // TODO: write subtype specific stuff
+
+        if (!m_objWriter.writeDictionary(stream, fontDict))
+        {
+            return false;
+        }
+
+        if (!m_objWriter.endWriteObject(stream))
+        {
+            return false;
+        }
+
+        // Font Descriptor
+        m_objWriter.startWriteObject(stream, descriptor);
+
+        Dictionary fontDescriptorDict;
+        fontDescriptorDict[PDF_DICT_KEY_TYPE] = PDF_DICT_VALUE_TYPE_FONTDESCRIPTOR;
+        fontDescriptorDict[PDF_DICT_KEY_ASCENT] = font->getAscent();
+        fontDescriptorDict[PDF_DICT_KEY_DESCENT] = font->getDescent();
+        fontDescriptorDict[PDF_DICT_KEY_FONTNAME] = NameObject(font->getFontName());
+
+        // TODO: write subtype specific stuff
+
+        if (!m_objWriter.writeDictionary(stream, fontDescriptorDict))
+        {
+            return false;
+        }
+
+        if (!m_objWriter.endWriteObject(stream))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool charta::pdf::Writer::writePageTree(std::ostream &stream, const Document &doc)
 {
     // No reference here, since it will be invalidated later
@@ -116,12 +179,12 @@ bool charta::pdf::Writer::writePageTree(std::ostream &stream, const Document &do
                            static_cast<IntegerObject>(page.getMediaBox().getUpper().x()),
                            static_cast<IntegerObject>(page.getMediaBox().getUpper().y())});
 
-        Dictionary catalogDict;
-        catalogDict[PDF_DICT_KEY_TYPE] = PDF_DICT_VALUE_TYPE_PAGE;
-        catalogDict[PDF_DICT_KEY_PARENT] = pageTree.id;
-        catalogDict[PDF_DICT_KEY_MEDIABOX] = mediaBoxArr;
+        Dictionary pageDict;
+        pageDict[PDF_DICT_KEY_TYPE] = PDF_DICT_VALUE_TYPE_PAGE;
+        pageDict[PDF_DICT_KEY_PARENT] = pageTree.id;
+        pageDict[PDF_DICT_KEY_MEDIABOX] = mediaBoxArr;
 
-        if (!m_objWriter.writeDictionary(stream, catalogDict))
+        if (!m_objWriter.writeDictionary(stream, pageDict))
         {
             return false;
         }

@@ -41,9 +41,14 @@ constexpr const char PDF_DICT_END[] = {PDF_GREATER_THAN, PDF_GREATER_THAN, '\0'}
 constexpr const char *PDF_DICT_KEY_PARENT = "Parent";
 constexpr const char *PDF_DICT_KEY_SIZE = "Size";
 constexpr const char *PDF_DICT_KEY_TYPE = "Type";
+constexpr const char *PDF_DICT_KEY_SUBTYPE = "Subype";
 constexpr const char *PDF_DICT_KEY_COUNT = "Count";
 constexpr const char *PDF_DICT_KEY_KIDS = "Kids";
 constexpr const char *PDF_DICT_KEY_MEDIABOX = "MediaBox";
+constexpr const char *PDF_DICT_KEY_ASCENT = "Ascent";
+constexpr const char *PDF_DICT_KEY_DESCENT = "Descent";
+constexpr const char *PDF_DICT_KEY_FONTNAME = "FontName";
+constexpr const char *PDF_DICT_KEY_BASEFONT = "BaseFont";
 
 // Trailer references
 constexpr const char *PDF_DICT_KEY_ROOT = "Root";
@@ -58,6 +63,8 @@ constexpr const char *PDF_DICT_KEY_INFO_CREATOR = "Creator";
 constexpr const char *PDF_DICT_KEY_INFO_PRODUCER = "Producer";
 
 // Dictionary types
+constexpr const char *PDF_DICT_VALUE_TYPE_FONT = "Font";
+constexpr const char *PDF_DICT_VALUE_TYPE_FONTDESCRIPTOR = "FontDescriptor";
 constexpr const char *PDF_DICT_VALUE_TYPE_PAGE = "Page";
 constexpr const char *PDF_DICT_VALUE_TYPE_PAGES = "Pages";
 constexpr const char *PDF_DICT_VALUE_TYPE_CATALOG = "Catalog";

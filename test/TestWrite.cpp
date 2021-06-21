@@ -4,7 +4,7 @@
 
 using namespace charta::pdf;
 
-TEST(Document, EmptyWrite)
+TEST(Write, Meta)
 {
     auto outFile = std::string(CHARTA_PDF_BINARY_PATH) + "/test_empty_write.pdf";
 
@@ -19,7 +19,7 @@ TEST(Document, EmptyWrite)
     EXPECT_TRUE(doc.saveToFile(outFile));
 }
 
-TEST(Document, PageWrite)
+TEST(Write, Page)
 {
     auto outFile = std::string(CHARTA_PDF_BINARY_PATH) + "/test_page_write.pdf";
 

@@ -1,19 +1,22 @@
 #pragma once
 #include "FontDescriptor.hpp"
 #include "FontType.hpp"
-#include <set>
 #include <istream>
+#include <set>
 #include <stdint.h>
 
 namespace charta::pdf
 {
 class Font
 {
-  private:
-    FontType m_subtype;
+  protected:
     FontDescriptor m_descriptor;
-    bool embed;
+    bool m_embed;
+
   public:
-    Font(FontType subtype);
+    virtual short getAscent() = 0;
+    virtual short getDescent() = 0;
+    virtual FontType getSubtype() = 0;
+    virtual std::string_view getFontName() = 0;
 };
 } // namespace charta::pdf

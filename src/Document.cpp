@@ -6,7 +6,7 @@
 
 charta::pdf::Document::~Document()
 {
-    for(auto & font : m_fonts)
+    for (auto &font : m_fonts)
     {
         delete font;
         font = nullptr;

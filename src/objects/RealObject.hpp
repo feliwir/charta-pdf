@@ -2,5 +2,5 @@
 
 namespace charta::pdf
 {
-using IntegerObject = int;
+using RealObject = double;
 }

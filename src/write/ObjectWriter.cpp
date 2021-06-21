@@ -65,6 +65,11 @@ bool charta::pdf::ObjectWriter::writeObject(std::ostream &stream, const Object &
         if (!writeInteger(stream, std::get<IntegerObject>(value), '\0'))
             return false;
     }
+    else if (std::holds_alternative<RealObject>(value))
+    {
+        if (!writeReal(stream, std::get<RealObject>(value), '\0'))
+            return false;
+    }
     else if (std::holds_alternative<IndirectObject>(value))
     {
         if (!writeIndirectObject(stream, std::get<IndirectObject>(value)))
@@ -145,11 +150,16 @@ charta::pdf::ObjectWriteInformation &charta::pdf::ObjectWriter::allocateWriteObj
     return obj;
 }
 
-bool charta::pdf::ObjectWriter::writeInteger(std::ostream &stream, int value, char seperator)
+bool charta::pdf::ObjectWriter::writeInteger(std::ostream &stream, IntegerObject value, char seperator)
 {
-    std::string value_str = std::to_string(value);
-    stream.write(value_str.data(), value_str.size());
+    stream << value;
+    return m_writer.writeSeperator(stream, seperator);
+}
 
+bool charta::pdf::ObjectWriter::writeReal(std::ostream &stream, RealObject value, char seperator)
+{
+    stream.imbue(std::locale::classic());
+    stream << value;
     return m_writer.writeSeperator(stream, seperator);
 }
 

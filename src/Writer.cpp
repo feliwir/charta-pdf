@@ -146,6 +146,18 @@ bool charta::pdf::Writer::writeFontDefinitions(std::ostream &stream, std::list<F
         fontDescriptorDict[PDF_DICT_KEY_ASCENT] = font->getAscent();
         fontDescriptorDict[PDF_DICT_KEY_DESCENT] = font->getDescent();
         fontDescriptorDict[PDF_DICT_KEY_FONTNAME] = NameObject(font->getFontName());
+        fontDescriptorDict[PDF_DICT_KEY_ITALICANGLE] = font->getItalicAngle();
+
+        auto capHeight = font->getCapHeight();
+        if (capHeight.has_value())
+        {
+            fontDescriptorDict[PDF_DICT_KEY_CAPHEIGHT] = IntegerObject(capHeight.value());
+        }
+        auto xHeight = font->getxHeight();
+        if (xHeight.has_value())
+        {
+            fontDescriptorDict[PDF_DICT_KEY_XHEIGHT] = IntegerObject(xHeight.value());
+        }
 
         // TODO: write subtype specific stuff
 

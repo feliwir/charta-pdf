@@ -20,7 +20,8 @@ class ObjectWriter
     {
     }
 
-    bool writeInteger(std::ostream &ostream, int value, char seperator = PDF_SPACE);
+    bool writeInteger(std::ostream &ostream, IntegerObject value, char seperator = PDF_SPACE);
+    bool writeReal(std::ostream &ostream, RealObject value, char seperator = PDF_SPACE);
     bool writeLiteralString(std::ostream &ostream, const LiteralString &value, char seperator = PDF_SPACE);
     bool writeArray(std::ostream &ostream, const Array &arr);
     bool writeDictionary(std::ostream &ostream, const Dictionary &dict);

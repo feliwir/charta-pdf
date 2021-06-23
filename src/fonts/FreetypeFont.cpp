@@ -17,6 +17,12 @@ charta::pdf::FreetypeFont::FreetypeFont(FT_Face face, uint8_t *data, size_t size
         loadOpenTypeTables();
         break;
     }
+
+    // Set the unicode charmap
+    if (FT_Select_Charmap(m_face, FT_ENCODING_UNICODE) != 0)
+    {
+        // TODO: error handling
+    }
 }
 
 void charta::pdf::FreetypeFont::loadOpenTypeTables()
@@ -83,4 +89,15 @@ std::optional<short> charta::pdf::FreetypeFont::getxHeight()
         return m_pcltTable->xHeight;
     }
     return {};
+}
+
+bool charta::pdf::FreetypeFont::addCodepoint(uint32_t codepoint)
+{
+    auto glyph_index = FT_Get_Char_Index(m_face, codepoint);
+    if (glyph_index == 0)
+    {
+        return false;
+    }
+    m_usedGylphs.insert(glyph_index);
+    return true;
 }

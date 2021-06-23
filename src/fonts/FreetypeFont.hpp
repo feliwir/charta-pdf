@@ -4,6 +4,7 @@
 #include FT_FREETYPE_H
 #include FT_FONT_FORMATS_H
 #include FT_TRUETYPE_TABLES_H
+#include <set>
 #include <vector>
 
 namespace charta::pdf
@@ -14,6 +15,7 @@ class FreetypeFont : public Font
     FontType m_subtype = FontType::Invalid;
     FT_Face m_face;
     const std::vector<uint8_t> m_data;
+    std::set<FT_UInt> m_usedGylphs;
 
     // TrueType / OpenType
     TT_Postscript *m_postScriptTable = nullptr;
@@ -31,6 +33,8 @@ class FreetypeFont : public Font
     double getItalicAngle() override;
     std::optional<short> getCapHeight() override;
     std::optional<short> getxHeight() override;
+
+    bool addCodepoint(uint32_t codepoint) override;
 
   private:
     void loadOpenTypeTables();

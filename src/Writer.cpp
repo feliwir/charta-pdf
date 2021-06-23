@@ -1,4 +1,5 @@
 #include "Writer.hpp"
+#include "write/WriteHelper.hpp"
 #include <iomanip>
 #include <sstream>
 
@@ -186,10 +187,7 @@ bool charta::pdf::Writer::writePageTree(std::ostream &stream, const Document &do
     {
         writtenPages.emplace_back(m_objWriter.startWriteObject(stream));
 
-        Array mediaBoxArr({static_cast<IntegerObject>(page.getMediaBox().getLower().x()),
-                           static_cast<IntegerObject>(page.getMediaBox().getLower().y()),
-                           static_cast<IntegerObject>(page.getMediaBox().getUpper().x()),
-                           static_cast<IntegerObject>(page.getMediaBox().getUpper().y())});
+        Array mediaBoxArr = WriteHelper::rectToArray<IntegerObject>(page.getMediaBox());
 
         Dictionary pageDict;
         pageDict[PDF_DICT_KEY_TYPE] = PDF_DICT_VALUE_TYPE_PAGE;

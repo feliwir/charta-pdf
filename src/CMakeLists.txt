@@ -2,7 +2,7 @@ find_package(Freetype REQUIRED)
 
 add_library(charta_pdf)
 
-target_link_libraries(charta_pdf Freetype::Freetype)
+target_link_libraries(charta_pdf PRIVATE utf8::cpp Freetype::Freetype)
 target_include_directories(charta_pdf PUBLIC ${CMAKE_SOURCE_DIR}/include)
 target_sources(charta_pdf PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/Document.cpp

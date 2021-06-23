@@ -25,5 +25,7 @@ class Font
     virtual double getItalicAngle() = 0;
     virtual std::optional<short> getCapHeight() = 0;
     virtual std::optional<short> getxHeight() = 0;
+
+    virtual bool addCodepoint(uint32_t codepoint) = 0;
 };
 } // namespace charta::pdf

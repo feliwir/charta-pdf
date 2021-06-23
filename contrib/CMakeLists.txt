@@ -1,3 +1,5 @@
+# utfcpp
+add_subdirectory(utfcpp)
 # Googletest
 if(BUILD_TESTING)
   set(BUILD_GMOCK OFF)
